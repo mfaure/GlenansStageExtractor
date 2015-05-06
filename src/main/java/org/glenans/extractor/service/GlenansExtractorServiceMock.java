@@ -12,13 +12,16 @@ import org.apache.log4j.Logger;
 import org.glenans.extractor.model.Stage;
 
 /**
- *
+ * Implementation of IGlenansExtractorService meant for development purpose
+ * It reads all stages directly from a JSON file, thus avoiding the extraction
+ * from the website (which can take a few minutes)
+ * 
  * @author meskoj
  */
 public class GlenansExtractorServiceMock implements IGlenansExtractorService {
 
     private static Logger LOGGER = Logger.getLogger(GlenansExtractorServiceMock.class);
-    private static String JSON_FILE_PATH = "$My_Path";
+    private static String JSON_FILE_PATH = "/home/mfaure/Documents/Perso/Perso-0permanent/GITHUB_Glenans_Stage_Extractor/StagesP.json";
             
     @Override
     public Collection<Stage> launchExtractor() throws InterruptedException {
