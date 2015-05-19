@@ -6,8 +6,16 @@
 package org.glenans.extractor.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -15,6 +23,15 @@ import java.io.Serializable;
  */
 public class Stage implements Serializable {
 
+    private static Logger LOGGER = Logger.getLogger(Stage.class);
+
+    public static String DATE_PATTERN_OUTPUT = "dd/MM/yy HH':'mm";
+
+    private static String[] ALL_DATE_PARSERS = {
+            "d/MM/yy 'à' HH'h'mm",
+            "d/MM/yy 'à' HH'H'mm",
+            "d/MM/yy"};
+        
     public static int DURATION_INDEX = 0;
     public static int FROM_DATE_INDEX = 1;
     public static int TO_DATE_INDEX = 2;
@@ -24,97 +41,105 @@ public class Stage implements Serializable {
     public static int AVAILABILITY_INDEX = 6;
     public static int FOOD_INDEX = 7;
     public static int PRICE_INDEX = 8;
-    
+
     private final String name;
+    private String city;
+    private float duration;
+    private Date fromDate;
+    private Date toDate;
+    private String hosting;
+    private String fleet;
+    private String language;
+    private String availibility; // @@@TODO create an ENUM with the 3 known states
+    private String food; // @@@TODO create an ENUM with the 3 known states
+    private String price;
+
     public String getName() {
         return name;
     }
-    
-    private String city;
+
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
-    
-    private float duration;
+
     public float getDuration() {
         return duration;
     }
-    
-    private String fromDate;
-    public String getFromDate() {
+
+    @JsonIgnore
+    public Date getFromDate() {
         return fromDate;
     }
-    public void setFromDate(String fromDate) {
-        this.fromDate = fromDate;
+
+    @JsonProperty("fromDate")
+    public String getFromDateAsString() {
+        return convertDateToString(fromDate);
     }
 
-    private String toDate;
-    public String getToDate() {
+    @JsonIgnore
+    public Date getToDate() {
         return toDate;
     }
-    public void setToDate(String toDate) {
-        this.toDate = toDate;
+
+    @JsonProperty("toDate")
+    public String getToDateAsString() {
+        return convertDateToString(toDate);
     }
     
-    private String hosting;
     public String getHosting() {
         return hosting;
     }
 
-    private String fleet;
     public String getFleet() {
         return fleet;
     }
- 
-    private String language;
+
     public String getLanguage() {
         return language;
     }
-   
-    private String availibility; // create an ENUM with the 3 known states
+
     public String getAvailibility() {
         return availibility;
     }
 
-    private String food; // create an ENUM with the 3 known states
     public String getFood() {
         return food;
     }
-    
-    private String price; 
+
     public String getPrice() {
         return price;
     }
-    
+
     @JsonCreator
     public Stage(
             @JsonProperty("name") String name,
             @JsonProperty("city") String city,
-            @JsonProperty("duration") String duration, 
-            @JsonProperty("fromDate") String fromDate, 
+            @JsonProperty("duration") String duration,
+            @JsonProperty("fromDate") String fromDate,
             @JsonProperty("toDate") String toDate,
-            @JsonProperty("hosting") String hosting, 
-            @JsonProperty("fleet") String fleet, 
-            @JsonProperty("language") String language, 
-            @JsonProperty("availibility") String availibility, 
-            @JsonProperty("food") String food, 
+            @JsonProperty("hosting") String hosting,
+            @JsonProperty("fleet") String fleet,
+            @JsonProperty("language") String language,
+            @JsonProperty("availibility") String availibility,
+            @JsonProperty("food") String food,
             @JsonProperty("price") String price) {
-        this.name = normalizeString(name);
-        this.duration = extractDuration(duration);
-        this.hosting = normalizeString(hosting);
-        this.fleet = normalizeString(fleet);
-        this.language = normalizeString(language);
-        this.availibility = normalizeString(availibility);
-        this.food = normalizeString(food);
-        this.price = normalizeString(price);
-        this.fromDate = normalizeString(fromDate);
-        this.toDate = normalizeString(toDate);
-        this.city = normalizeString(city);
+        this.name           = normalizeString(name);
+        this.duration       = extractDuration(duration);
+        this.hosting        = normalizeString(hosting);
+        this.fleet          = normalizeString(fleet);
+        this.language       = normalizeString(language);
+        this.availibility   = normalizeString(availibility);
+        this.food           = normalizeString(food);
+        this.price          = normalizeString(price);
+        this.fromDate       = convertStringToDate(fromDate);
+        this.toDate         = convertStringToDate(toDate);
+        this.city           = normalizeString(city);
     }
-    
+
     private String normalizeString(String data) {
         return data
                 .replace("Stage", "")
@@ -123,13 +148,43 @@ public class Stage implements Serializable {
                 .replaceAll("/", "-")
                 .trim();
     }
-    
+
+    private String normalizeDateString(String data) {
+        return data
+                .trim();
+    }
+
     private float extractDuration(String duration) {
         if (!duration.contains(" ")) {
-            return Integer.valueOf(duration);
-        }  
-        return Float.valueOf(duration.substring(0,duration.indexOf(" ")).trim());
-               
+            return Float.valueOf(duration);
+        }
+        return Float.valueOf(duration.substring(0, duration.indexOf(" ")).trim());
+    }
+
+    public static Date convertStringToDate(String stringDate) {
+        /*
+         Date can have two formats:
+         - "04/10/15" for october, 4th 2015
+         - "04/10/15 à 14h00" for october, 4th 2015, 2pm
+         */
+        DateFormat df = new SimpleDateFormat("dd/MM/yy", Locale.FRANCE);
+        DateFormat dfWithTime = new SimpleDateFormat("d/MM/yy 'à' HH'h'mm", Locale.FRANCE);
+        
+        try {
+            LOGGER.info("Date : " + stringDate);
+            return DateUtils.parseDate(stringDate, ALL_DATE_PARSERS);
+        } catch (ParseException ex) {
+            LOGGER.info("ParseException : " + ex);
+        }
+        return null;
     }
     
+    public static String convertDateToString(Date stringDate) {
+        if (stringDate == null) {
+            return "";
+        } else {
+            return new SimpleDateFormat(DATE_PATTERN_OUTPUT, Locale.FRANCE).format(stringDate);
+        }
+    }
+
 }

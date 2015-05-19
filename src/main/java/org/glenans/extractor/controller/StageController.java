@@ -29,14 +29,14 @@ public class StageController {
     // List of stage : real extraction
     private IGlenansExtractorService glenansExtractor = new GlenansExtractorService();
 
-    public StageController () {
+    public StageController() {
         try {
             launchExtraction();
             LOGGER.info(stageList.size() + " stages loaded on constructor");
         } catch (InterruptedException ex) {
         }
     }
-    
+
     @RequestMapping("/stagesP")
     public Collection<Stage> stagesP(
             @RequestParam(required = false) final Collection<String> names,
@@ -44,45 +44,46 @@ public class StageController {
             @RequestParam(required = false) final Integer duration) {
         return filterStage(new StagePredicate(names, city, duration));
     }
-    
+
     @RequestMapping("/launchExtraction")
     public final String launchExtraction() throws InterruptedException {
         stageList = glenansExtractor.launchExtractor();
         return "OK";
     }
-    
+
     /**
-     * 
+     *
      * @param predicate
-     * @return 
+     * @return
      */
     private Collection<Stage> filterStage(Predicate predicate) {
         return filterStage(stageList, predicate);
     }
-    
+
     /**
-     * 
+     *
      * @param stages
      * @param predicate
-     * @return 
+     * @return
      */
     private Collection<Stage> filterStage(Collection<Stage> stages, Predicate predicate) {
+        // copy all stages in a list because CollectionUtils.filter modifies the list
         Collection<Stage> stagesCopy = new ArrayList<>();
         stagesCopy.addAll(stages);
         CollectionUtils.filter(stagesCopy, predicate);
         return stagesCopy;
     }
-    
+
     private class StagePredicate implements Predicate {
-        
-        private int duration = -1; 
-        private Collection<String> cities = Collections.EMPTY_LIST; 
+
+        private int duration = -1;
+        private Collection<String> cities = Collections.EMPTY_LIST;
         private Collection<String> names = Collections.EMPTY_LIST;
-        
+
         public StagePredicate(Integer duration) {
             this.duration = duration;
         }
-        
+
         public StagePredicate(
                 Collection<String> names,
                 Collection<String> cities,
@@ -93,26 +94,26 @@ public class StageController {
             this.names = names;
             this.cities = cities;
         }
-        
+
         @Override
         public boolean evaluate(Object o) {
-            Stage stage = ((Stage)o);
-            return evaluateCity(stage) 
-                    && evaluateName(stage) 
+            Stage stage = ((Stage) o);
+            return evaluateCity(stage)
+                    && evaluateName(stage)
                     && evaluateDuration(stage);
         }
-        
+
         private boolean evaluateCity(Stage stage) {
             return CollectionUtils.isEmpty(cities) || CollectionUtils.containsAny(cities, Arrays.asList(stage.getCity()));
         }
-        
+
         private boolean evaluateName(Stage stage) {
             return CollectionUtils.isEmpty(names) || CollectionUtils.containsAny(names, Arrays.asList(stage.getName()));
         }
-        
+
         private boolean evaluateDuration(Stage stage) {
             return duration == -1 || stage.getDuration() == duration;
         }
     }
-    
+
 }

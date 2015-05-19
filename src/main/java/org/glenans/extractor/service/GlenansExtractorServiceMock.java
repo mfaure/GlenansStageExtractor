@@ -21,7 +21,7 @@ import org.glenans.extractor.model.Stage;
 public class GlenansExtractorServiceMock implements IGlenansExtractorService {
 
     private static Logger LOGGER = Logger.getLogger(GlenansExtractorServiceMock.class);
-    private static String JSON_FILE_PATH = "/home/mfaure/Documents/Perso/Perso-0permanent/GITHUB_Glenans_Stage_Extractor/StagesP.json";
+    private static String JSON_FILE_PATH = "/home/mfaure/Documents/Perso/Perso-0permanent/GITHUB_Glenans_Stage_Extractor/GlenansStageExtractor/src/main/resources/stagesP.json";
             
     @Override
     public Collection<Stage> launchExtractor() throws InterruptedException {

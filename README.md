@@ -1,6 +1,13 @@
 # GlenansStageExtractor
 Extract stages from Glenans (sailing school) website
 
+## Prerequisites
+
+* Linux host (tested on Ubuntu 14.04)
+* Maven
+* Firefox 
+* XVFB
+
 ## Lancement Méthode 1
 
 * aller dans le dossier <projet> 
@@ -17,8 +24,9 @@ Extract stages from Glenans (sailing school) website
 
 * Initialisation : Appeler http://localhost:8080/launchExtraction
 * Lister tous les stages P : http://localhost:8080/stagesP
-
-http://localhost:8080/stagesP?city=Vannes,Paimpol
+* Lister tous les stages P à Vannes : http://localhost:8080/stagesP?city=Vannes (respecter la casse)
+* Lister tous les stages P à Vannes ou Paimpol: http://localhost:8080/stagesP?city=Vannes,Paimpol (respecter la casse)
+* Lister tous les stages P à Vannes ou Paimpol de 5 jours : http://localhost:8080/stagesP?city=Vannes,Paimpol&duration=5 (respecter la casse)
 
 ## Ressources
 
@@ -38,6 +46,8 @@ http://localhost:8080/stagesP?city=Vannes,Paimpol
 
 ## TODO
 
+* récupérer aussi l'URL du stage
+* ajouter dans les résultats la date d'extraction et le nombre de résultats (ainsi les résultats de requêtes ne seront jamais vide)
 * implémenter dates sous forme de date (et non string) pour pouvoir faire les requêtes par date de début / fin ou durée
 * implémenter durée du stage
 * implémenter appli cliente (Angular ? autre utils pour faire des filtres/tris facilement ?)
