@@ -26,6 +26,7 @@ public class GlenansExtractorService implements IGlenansExtractorService {
     private static Logger LOGGER = Logger.getLogger(GlenansExtractorService.class);
     private static String FIREFOX_PATH = "/opt/firefox/firefox/";
     private static String URL_STAGES_P = "http://www.glenans.asso.fr/fr/pratiquer/stages-de-voile/rechercher-un-stage/moniteurs.html?search=1&fil_id=1&niv_id=9&start_date=Indiff%C3%A9rent&lan_id=1&site_id=0&submit=Rechercher&language=fr-FR&id=0";
+    private static String FIELD_SEPARATOR = "µ";
             
     @Override
     public Collection<Stage> launchExtractor() throws InterruptedException {
@@ -105,15 +106,15 @@ public class GlenansExtractorService implements IGlenansExtractorService {
                     if (childImgs.isEmpty() || StringUtils.isNotBlank(element.getText())) {
                         // Grab text inside TD
                         strb.append(element.getText().replaceAll("[\n\r]", " "));
-                        strb.append(",");
+                        strb.append(FIELD_SEPARATOR);
                     } else {
                         LOGGER.info("img encountered with alt " + childImgs.iterator().next().getAttribute("alt"));
                         // IMG is child so grab ALT
                         strb.append(childImgs.iterator().next().getAttribute("alt").replaceAll("[\n\r]", " "));
-                        strb.append(",");
+                        strb.append(FIELD_SEPARATOR);
                     }
                 }
-                String[] stageInfo = strb.toString().split(",");
+                String[] stageInfo = strb.toString().split(FIELD_SEPARATOR);
 
                 Stage stage = new Stage(
                                 type,
