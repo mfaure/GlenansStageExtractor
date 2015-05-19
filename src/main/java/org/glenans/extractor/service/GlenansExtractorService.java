@@ -23,10 +23,10 @@ import org.openqa.selenium.firefox.FirefoxProfile;
  */
 public class GlenansExtractorService implements IGlenansExtractorService {
 
-    private static Logger LOGGER = Logger.getLogger(GlenansExtractorService.class);
-    private static String FIREFOX_PATH = "/opt/firefox/firefox/";
-    private static String URL_STAGES_P = "http://www.glenans.asso.fr/fr/pratiquer/stages-de-voile/rechercher-un-stage/moniteurs.html?search=1&fil_id=1&niv_id=9&start_date=Indiff%C3%A9rent&lan_id=1&site_id=0&submit=Rechercher&language=fr-FR&id=0";
-    private static String FIELD_SEPARATOR = "µ";
+    private static final Logger LOGGER = Logger.getLogger(GlenansExtractorService.class);
+    private static final String FIREFOX_PATH = "/opt/firefox/firefox/";
+    private static final String URL_STAGES_P = "http://www.glenans.asso.fr/fr/pratiquer/stages-de-voile/rechercher-un-stage/moniteurs.html?search=1&fil_id=1&niv_id=9&start_date=Indiff%C3%A9rent&lan_id=1&site_id=0&submit=Rechercher&language=fr-FR&id=0";
+    private static final String FIELD_SEPARATOR = "µ";
             
     @Override
     public Collection<Stage> launchExtractor() throws InterruptedException {
@@ -69,6 +69,8 @@ public class GlenansExtractorService implements IGlenansExtractorService {
         we.findElement(By.tagName("form")).submit();
         Thread.sleep(5000);
 
+        String stageURL = webdriver.getCurrentUrl();
+        
         Collection<Stage> stagesByType = new ArrayList<>();
         String stageTitle = webdriver.findElement(By.tagName("h2")).getText();
         LOGGER.info("extracting data for stage " + stageTitle);
@@ -79,7 +81,7 @@ public class GlenansExtractorService implements IGlenansExtractorService {
             LOGGER.info("extracting data of city " + city);
             // click on the panel tab, to update the content of the table of sessions
             wec.click();
-            stagesByType.addAll(extractStageFromLine(webdriver, stageTitle, city));
+            stagesByType.addAll(extractStageFromLine(webdriver, stageURL, stageTitle, city));
         }
         return stagesByType;
 
@@ -88,12 +90,14 @@ public class GlenansExtractorService implements IGlenansExtractorService {
     /**
      * 
      * @param webdriver
+     * @param url
      * @param type
      * @param city
      * @return 
      */
     private Collection<Stage> extractStageFromLine(
             WebDriver webdriver, 
+            String url, 
             String type, 
             String city) {
         Collection<Stage> stageByTypeAndCity = new ArrayList<>();
@@ -117,6 +121,7 @@ public class GlenansExtractorService implements IGlenansExtractorService {
                 String[] stageInfo = strb.toString().split(FIELD_SEPARATOR);
 
                 Stage stage = new Stage(
+                                url,
                                 type,
                                 city,
                                 stageInfo[Stage.DURATION_INDEX],

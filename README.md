@@ -46,9 +46,9 @@ Extract stages from Glenans (sailing school) website
 
 ## TODO
 
-* récupérer aussi l'URL du stage
+* DONE récupérer aussi l'URL du stage
+* DONE implémenter dates sous forme de date (et non string) pour pouvoir faire les requêtes par date de début / fin ou durée
 * ajouter dans les résultats la date d'extraction et le nombre de résultats (ainsi les résultats de requêtes ne seront jamais vide)
-* implémenter dates sous forme de date (et non string) pour pouvoir faire les requêtes par date de début / fin ou durée
 * implémenter durée du stage
 * implémenter appli cliente (Angular ? autre utils pour faire des filtres/tris facilement ?)
 

@@ -42,6 +42,7 @@ public class Stage implements Serializable {
     public static int FOOD_INDEX = 7;
     public static int PRICE_INDEX = 8;
 
+    private final String url;
     private final String name;
     private String city;
     private float duration;
@@ -54,6 +55,10 @@ public class Stage implements Serializable {
     private String food; // @@@TODO create an ENUM with the 3 known states
     private String price;
 
+    public String getUrl() {
+        return url;
+    }
+    
     public String getName() {
         return name;
     }
@@ -116,6 +121,7 @@ public class Stage implements Serializable {
 
     @JsonCreator
     public Stage(
+            @JsonProperty("url") String url,
             @JsonProperty("name") String name,
             @JsonProperty("city") String city,
             @JsonProperty("duration") String duration,
@@ -127,6 +133,7 @@ public class Stage implements Serializable {
             @JsonProperty("availibility") String availibility,
             @JsonProperty("food") String food,
             @JsonProperty("price") String price) {
+        this.url            = url;
         this.name           = normalizeString(name);
         this.duration       = extractDuration(duration);
         this.hosting        = normalizeString(hosting);
@@ -145,6 +152,7 @@ public class Stage implements Serializable {
                 .replace("Stage", "")
                 .replace("stage", "")
                 .replaceAll("“", "")
+                .replaceAll("”", "")
                 .replaceAll("/", "-")
                 .trim();
     }
