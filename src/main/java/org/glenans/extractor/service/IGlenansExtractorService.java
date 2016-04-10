@@ -9,12 +9,10 @@ import org.glenans.extractor.model.Stage;
  */
 public interface IGlenansExtractorService {
     
-          
     /**
      * 
-     * @return 
-     * @throws java.lang.InterruptedException 
+     * @throws java.lang.InterruptedException
      */
-    public Collection<Stage> launchExtractor() throws InterruptedException;
+    Collection<Stage> launchExtractor() throws InterruptedException;
     
 }

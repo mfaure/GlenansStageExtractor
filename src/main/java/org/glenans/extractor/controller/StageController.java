@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.log4j.Logger;
@@ -33,7 +34,7 @@ public class StageController {
         try {
             launchExtraction();
             LOGGER.info(stageList.size() + " stages loaded on constructor");
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -52,8 +53,7 @@ public class StageController {
     }
 
     /**
-     *
-     * @param predicate
+     * @param predicate : a predicate which can be one or many picked from: city, names, duration
      * @return
      */
     private Collection<Stage> filterStage(Predicate predicate) {
@@ -61,9 +61,8 @@ public class StageController {
     }
 
     /**
-     *
      * @param stages
-     * @param predicate
+     * @param predicate : a predicate which can be one or many picked from: city, names, duration
      * @return
      */
     private Collection<Stage> filterStage(Collection<Stage> stages, Predicate predicate) {
@@ -104,15 +103,18 @@ public class StageController {
         }
 
         private boolean evaluateCity(Stage stage) {
-            return CollectionUtils.isEmpty(cities) || CollectionUtils.containsAny(cities, Arrays.asList(stage.getCity()));
+            return CollectionUtils.isEmpty(cities)
+                    || CollectionUtils.containsAny(cities, Arrays.asList(stage.getCity()));
         }
 
         private boolean evaluateName(Stage stage) {
-            return CollectionUtils.isEmpty(names) || CollectionUtils.containsAny(names, Arrays.asList(stage.getName()));
+            return CollectionUtils.isEmpty(names)
+                    || CollectionUtils.containsAny(names, Arrays.asList(stage.getName()));
         }
 
         private boolean evaluateDuration(Stage stage) {
-            return duration == -1 || stage.getDuration() == duration;
+            return duration == -1
+                    || stage.getDuration() == duration;
         }
     }
 
